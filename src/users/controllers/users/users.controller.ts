@@ -38,19 +38,17 @@ export class UsersController {
     ) {
         const user = await this.userService.findOneByEmail(email)
         
-        if(!user || await !bcrypt.compare(password, user.password)) {
+        if(user && (await bcrypt.compare(password, user.password))) {
+            const jwt = await this.jwtService.signAsync({id: user.id})
+            response.cookie('jwt', jwt, {httpOnly: true})
+            
+            delete user.password
+            return {
+                message: 'Logged in successfully',
+                user
+            }
+        } else {
             throw new BadRequestException('Invalid Credentials')
-        }
-       
-
-        const jwt = await this.jwtService.signAsync({id: user.id})
-
-        response.cookie('jwt', jwt, {httpOnly: true})
-
-        delete user.password
-        return {
-            message: 'Logged in successfully',
-            user
         }
     }
     
