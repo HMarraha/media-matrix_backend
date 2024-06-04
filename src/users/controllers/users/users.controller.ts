@@ -4,6 +4,13 @@ import * as bcrypt from 'bcrypt'
 import { CreateUserDto } from 'src/users/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import {Request, Response} from 'express';
+import Role from 'src/users/User';
+
+class AssignRoleDto {
+    userId: number;
+    role: Role;
+}
+
 @Controller('users')
 export class UsersController {
     constructor(
@@ -77,4 +84,16 @@ export class UsersController {
             message: 'Logged out successfully'
         }
     }
+    @Post('assign-role')
+    async assignRole(@Body() assignRoleDto: AssignRoleDto) {
+        const { userId, role } = assignRoleDto;
+        try {
+            const updatedUser = await this.userService.assignRole(userId, role);
+            const {password, ...result} = updatedUser
+            return { message: 'Role assigned successfully', user: result };
+        } catch (error) {         
+              throw new UnauthorizedException();         
+        }
+    }
 }
+

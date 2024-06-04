@@ -1,6 +1,10 @@
-import { UsePipes, ValidationPipe } from "@nestjs/common";
-import { IsEmail, IsNotEmpty, Length } from "class-validator";
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+
+enum Role {
+    USER = 'user',
+    ADMIN = 'admin',
+    PREMIUM = 'premium'
+}
 
 @Entity('users')
 export class User {
@@ -15,4 +19,8 @@ export class User {
 
     @Column()
     password: string
+
+    @Column({ type: "enum", enum: Role, default: Role.USER })
+    role: Role
 }
+export default Role
